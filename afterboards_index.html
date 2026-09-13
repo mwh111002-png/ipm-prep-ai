@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta name="description" content="AfterBoards — free mobile-first management entrance mock practice.">
+<link rel="manifest" href='data:application/manifest+json,{"name":"AfterBoards","short_name":"AfterBoards","start_url":".","display":"standalone","background_color":"%23f5f7fb","theme_color":"%230f172a"}'>
+<title>AfterBoards</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--ink:#111827;--muted:#64748b;--line:#e2e8f0;--brand:#2563eb;--brand2:#1d4ed8;--good:#15803d;--bad:#dc2626;--shadow:0 8px 30px rgba(15,23,42,.08)}
+*{box-sizing:border-box}html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}
+body{min-width:360px}.app{max-width:900px;margin:auto;padding:14px 12px 84px}.top{position:sticky;top:0;z-index:10;background:rgba(245,247,251,.94);backdrop-filter:blur(10px);padding:8px 0 12px}.brand{display:flex;align-items:center;justify-content:space-between;gap:8px}.brand h1{font-size:24px;margin:0}.pill{font-size:12px;padding:5px 9px;border-radius:999px;background:#dbeafe;color:#1e40af;font-weight:700}
+.nav{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}.nav button,.btn{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 8px;font-weight:700;color:var(--ink)}.nav button.active,.btn.primary{background:var(--brand);color:white;border-color:var(--brand)}
+.view{display:none}.view.active{display:block}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:var(--shadow)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.exam{padding:14px;border:1px solid var(--line);border-radius:15px;background:#fff}.exam h3{margin:0 0 5px;font-size:16px}.small{font-size:13px;color:var(--muted)}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.between{display:flex;justify-content:space-between;align-items:center;gap:10px}.sectionbar{display:flex;gap:7px;overflow:auto;padding:4px 0}.sectionbar button{white-space:nowrap}.timer{font-variant-numeric:tabular-nums;font-weight:900;font-size:18px}.progress{height:8px;background:#e2e8f0;border-radius:9px;overflow:hidden}.progress>i{display:block;height:100%;background:var(--brand);width:0}.qmeta{color:var(--muted);font-size:13px;margin-bottom:8px}.qtext{font-size:18px;line-height:1.45;font-weight:700}.opts{display:grid;gap:9px;margin-top:14px}.opt{display:flex;gap:10px;text-align:left;width:100%;border:1px solid var(--line);background:#fff;padding:12px;border-radius:13px}.opt b{min-width:26px}.opt.sel{border-color:var(--brand);background:#eff6ff}.actions{display:flex;gap:8px;margin-top:15px}.actions .btn{flex:1}.danger{color:var(--bad)}textarea,input[type=text]{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px;background:#fff}.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}.stat strong{display:block;font-size:21px}.hidden{display:none!important}.tag{display:inline-block;font-size:11px;padding:4px 7px;border-radius:999px;background:#f1f5f9;color:#475569;margin:2px}.result{border-left:4px solid var(--brand);padding-left:10px}.ok{color:var(--good)}.bad{color:var(--bad)}.notice{background:#fffbeb;border:1px solid #fde68a;padding:11px;border-radius:12px;font-size:13px}.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.statgrid{grid-template-columns:repeat(2,1fr)}.nav{grid-template-columns:repeat(3,1fr)}.nav button{font-size:12px;padding:9px 3px}.qtext{font-size:17px}}
+@media(min-width:700px){.app{padding-top:20px}.card{padding:20px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand"><h1>AfterBoards</h1><span class="pill">100% Free</span></div>
+  <div class="nav">
+    <button data-view="home" class="active">Mocks</button><button data-view="vocab">Vocab</button><button data-view="stats">Stats</button>
+  </div>
+</header>
+
+<main>
+<section id="home" class="view active">
+  <div class="card">
+    <h2>Choose your exam</h2>
+    <p class="small">20 deterministic mock versions are available for every exam below. Questions are original PYQ-style unless a licensed PYQ pack is explicitly added.</p>
+    <div id="examGrid" class="grid"></div>
+  </div>
+  <div id="mockPicker" class="card hidden"></div>
+</section>
+
+<section id="vocab" class="view">
+  <div class="card">
+    <div class="between"><div><h2 style="margin:0">Random vocabulary</h2><div class="small">IPMAT/management entrance level</div></div><button class="btn primary" id="newWord">New word</button></div>
+    <div id="wordBox" style="margin-top:15px"></div>
+  </div>
+</section>
+
+<section id="stats" class="view">
+  <div class="card"><h2>Local performance</h2><div id="statsBox"></div><button class="btn" id="clearStats" style="margin-top:10px">Clear local statistics</button></div>
+</section>
+
+<section id="test" class="view">
+  <div class="card">
+    <div class="between"><div><strong id="testTitle">Mock</strong><div id="testMeta" class="small"></div></div><div class="timer" id="timer">00:00</div></div>
+    <div class="progress" style="margin-top:10px"><i id="progress"></i></div>
+  </div>
+  <div id="sectionTabs" class="sectionbar"></div>
+  <div class="card" id="questionCard"></div>
+</section>
+</main>
+<div class="footer">AfterBoards • no account • no paid features • no AI • local stats only</div>
+</div>
+
+<script>
+"use strict";
+
+/* ===== VERIFIED 2026 PATTERNS =====
+IIM Indore IPM AT: QA-MCQ 15, QA-SA 15, VA 45; 120 min; +4, -1 except SA no negative.
+IIM Rohtak IPM AT: QA 40, LR 40, VA 40; 120 min; +4, -1.
+SET: English 16, Quant 16, GA 16, Analytical/Logical Reasoning 12; 60 min; +1, no negative.
+MAH BBA/BMS CET: English 30, Reasoning 30, GK/GA 20, Computer Basics 20; 120 min; +1, no negative.
+IIM Bangalore UG: English Comprehension 15, Quant & DI 30, LR 15; 120 min; +4, -1/3.
+*/
+const EXAMS={
+ ipmat_indore:{name:"IPMAT Indore",minutes:120,mark:4,neg:1,sections:[
+  ["QA-MCQ",15,"mcq"],["QA-SA",15,"sa"],["VA",45,"verbal"]]},
+ ipmat_rohtak:{name:"IPMAT Rohtak",minutes:120,mark:4,neg:1,sections:[
+  ["Quantitative Ability",40,"quant"],["Logical Reasoning",40,"logic"],["Verbal Ability",40,"verbal"]]},
+ set:{name:"SET",minutes:60,mark:1,neg:0,sections:[
+  ["General English",16,"verbal"],["Quantitative",16,"quant"],["General Awareness",16,"ga"],["Analytical & Logical Reasoning",12,"logic"]]},
+ mah_bba:{name:"MAH BBA/BMS CET",minutes:120,mark:1,neg:0,sections:[
+  ["English",30,"verbal"],["Reasoning",30,"logic"],["GK/GA",20,"ga"],["Computer Basics",20,"computer"]]},
+ iimb_ug:{name:"IIM Bangalore UG",minutes:120,mark:4,neg:1/3,sections:[
+  ["English Comprehension",15,"verbal"],["Quantitative & DI",30,"quant"],["Logical Reasoning",15,"logic"]]}
+};
+
+const WORDS=[
+["Abate","to become less intense","The storm began to abate.","decrease"],
+["Axiom","a statement accepted as a starting truth","The model uses a basic axiom.","principle"],
+["Candid","honest and direct","She gave a candid response.","frank"],
+["Diligent","careful and hardworking","A diligent student checks every step.","industrious"],
+["Elaborate","detailed or carefully developed","He gave an elaborate explanation.","detailed"],
+["Inevitable","certain to happen","Some change is inevitable.","unavoidable"],
+["Jargon","special words used by a profession","The report is full of technical jargon.","terminology"],
+["Lavish","very generous or abundant","They received lavish praise.","generous"],
+["Pragmatic","focused on practical results","We need a pragmatic solution.","practical"],
+["Reticent","not willing to speak freely","He was reticent during the discussion.","reserved"],
+["Stagnation","a state of little or no growth","The industry faced stagnation.","inactivity"],
+["Vital","essential or extremely important","Time management is vital.","essential"],
+["Amateur","a person without professional training","He is an amateur photographer.","novice"],
+["Repository","a place where information is stored","The archive is a repository of data.","storehouse"],
+["Renaissance","a revival or renewed interest","The city saw a cultural renaissance.","revival"],
+["Extravagant","excessive or expensive","The proposal was extravagant.","excessive"],
+["Tenacious","persistent and determined","Her tenacious effort paid off.","persistent"],
+["Concise","brief but clear","Give a concise answer.","succinct"],
+["Ambiguous","open to more than one meaning","The instruction was ambiguous.","unclear"],
+["Mitigate","to make less severe","Planning can mitigate risk.","reduce"]
+];
+
+const STORAGE="afterboards.stats.v1";
+const state={exam:null,mock:null,questions:[],answers:{},qIndex:0,sectionIndex:0,endAt:0,timer:null,startedAt:0,qStartedAt:0,questionTimes:{},finished:false};
+
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
+function hashSeed(str){let h=2166136261>>>0;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0;}
+function rng(seed){let a=seed>>>0;return()=>{a+=0x6D2B79F5;a=Math.imul(a^a>>>15,1|a);a^=a+Math.imul(a^a>>>7,61|a);return((a^a>>>14)>>>0)/4294967296};}
+function shuffle(a,r){for(let i=a.length-1;i>0;i--){let j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a||1}
+function q(id,section,type,text,options,answer,explain="",source="original"){return{id,section,type,text,options,answer,explain,source}}
+function mcq(section,type,text,correct,distractors,explain){return{text,section,type,correct,distractors,explain}}
+function makeQ(seed,section,type,i){
+ const r=rng(seed+i*9973); const n=1+Math.floor(r()*49);
+ if(type==="quant"||type==="mcq"||type==="sa"){
+   const kind=i%6;
+   if(kind===0){let a=10+Math.floor(r()*40),b=5+Math.floor(r()*30);let ans=a+b;return mcq(section,type,`If ${a} units are added to ${b}, what is the result?`,String(ans),[String(ans+2),String(ans-2),String(ans+5)],"Add the two quantities.")}
+   if(kind===1){let a=20+Math.floor(r()*40),b=2+Math.floor(r()*9);let ans=a*b;return mcq(section,type,`A quantity is ${a} and is multiplied by ${b}. What is the result?`,String(ans),[String(ans+b),String(ans-b),String(ans*b+1)],"Multiply directly.")}
+   if(kind===2){let p=10+Math.floor(r()*40),base=50+Math.floor(r()*150);let ans=base*p/100;return mcq(section,type,`${p}% of ${base} equals:`,String(ans),[String(ans+5),String(ans-5),String(ans*2)],"Use percentage × base / 100.")}
+   if(kind===3){let a=2+Math.floor(r()*8),b=2+Math.floor(r()*8),ans=a+b;return mcq(section,type,`If x = ${a} and y = ${b}, find x + y.`,String(ans),[String(ans+1),String(ans-1),String(a*b)],"Substitute the given values.")}
+   if(kind===4){let a=3+Math.floor(r()*7),ans=a*a;return mcq(section,type,`What is ${a}²?`,String(ans),[String(a*2),String(a*a+1),String(a*a-1)],"Square the number.")}
+   let a=60+Math.floor(r()*40),b=10+Math.floor(r()*20),ans=a-b;return mcq(section,type,`A value falls from ${a} to ${b}. What is the absolute decrease?`,String(ans),[String(a+b),String(b-a),String(ans+1)],"Subtract the smaller value from the larger value.")}
+ if(type==="logic"){
+   const names=["Aarav","Bina","Chetan","Diya","Esha"]; const x=names[i%5],y=names[(i+1)%5],z=names[(i+2)%5];
+   const ans=`${x} comes before ${y}`; return mcq(section,type,`In a queue, ${x} is ahead of ${y}, and ${y} is ahead of ${z}. Which statement must be true?`,ans,[`${y} comes before ${x}`,`${z} comes before ${x}`,`${z} comes before ${y}`],"Use transitivity of order.")}
+ if(type==="verbal"){
+   const pairs=[["rapid","quick","slow","late","fast"],["brief","concise","lengthy","noisy","random"],["honest","candid","false","silent","vague"],["essential","vital","optional","minor","rare"]];
+   const [w,ans,...ds]=pairs[i%pairs.length];return mcq(section,type,`Choose the word closest in meaning to "${w}".`,ans,ds,"Select the closest synonym.")}
+ if(type==="ga"){
+   const facts=[["The currency of Japan is:","Yen",["Won","Rupee","Dollar"]],["The largest planet in our solar system is:","Jupiter",["Mars","Venus","Mercury"]],["The headquarters of the United Nations is in:","New York",["Geneva","Paris","London"]],["GDP stands for:","Gross Domestic Product",["General Development Price","Gross Domestic Price","Global Domestic Product"]]];
+   const f=facts[i%facts.length];return mcq(section,type,f[0],f[1],f[2],"Recall the standard fact.")}
+ if(type==="computer"){
+   const facts=[["CPU stands for:","Central Processing Unit",["Central Program Utility","Computer Primary Unit","Control Processing User"]],["Which is an input device?","Keyboard",["Monitor","Speaker","Projector"]],["URL stands for:","Uniform Resource Locator",["Universal Read Link","User Routing List","Unified Resource Line"]],["Which is volatile memory?","RAM",["ROM","SSD","DVD"]]];
+   const f=facts[i%facts.length];return mcq(section,type,f[0],f[1],f[2],"Recall the basic computer concept.")}
+ return mcq(section,type,"Choose the correct option.","A",["B","C","D"],"Select the correct option.");
+}
+function materialize(raw,seed,id){
+ const r=rng(seed);let opts=[raw.correct,...raw.distractors];shuffle(opts,r);return q(id,raw.section,raw.type,raw.text,opts,opts.indexOf(raw.correct),raw.explain,"original");
+}
+function buildMock(examKey,mockNo){
+ const cfg=EXAMS[examKey], base=hashSeed(examKey+"|mock|"+mockNo), out=[], seen=new Set();
+ cfg.sections.forEach(([section,count,type],si)=>{
+   for(let i=0;i<count;i++){
+     let raw,tries=0,id;
+     do{raw=makeQ(base+si*100003,section,type,i+tries);id=`${examKey}-${mockNo}-${si}-${i}-${tries}`;tries++}while(seen.has(raw.text)&&tries<20);
+     seen.add(raw.text);out.push(materialize(raw,base+i+si*71,id));
+   }
+ });
+ return out;
+}
+function totalQ(cfg){return cfg.sections.reduce((s,x)=>s+x[1],0)}
+function scoreAnswers(questions,answers,cfg){
+ let correct=0,wrong=0,unattempted=0;
+ questions.forEach(qn=>{
+  const a=answers[qn.id]; const blank=a==null||a==="";
+  if(blank){unattempted++;return}
+  const ok=qn.type==="sa"?String(a).trim()===String(qn.options[qn.answer]).trim():a===qn.answer;
+  ok?correct++:wrong++;
+ });
+ const score=correct*cfg.mark-wrong*cfg.neg;
+ return {correct,wrong,unattempted,score,max:questions.length*cfg.mark};
+}
+function validateQuestionBank(questions){
+ return questions.length>0 && questions.every(qn=>qn.source==="original"||qn.source==="licensed-pyq") &&
+   questions.every(qn=>Number.isInteger(qn.answer)&&qn.answer>=0&&qn.answer<qn.options.length);
+}
+function saveStat(rec){let a=JSON.parse(localStorage.getItem(STORAGE)||"[]");a.unshift(rec);a=a.slice(0,100);localStorage.setItem(STORAGE,JSON.stringify(a))}
+function getStats(){return JSON.parse(localStorage.getItem(STORAGE)||"[]")}
+function renderExams(){
+ const el=document.getElementById("examGrid");el.innerHTML=Object.entries(EXAMS).map(([k,c])=>`<div class="exam"><h3>${esc(c.name)}</h3><div class="small">${totalQ(c)} questions • ${c.minutes} min • ${c.neg?`-${c.neg} wrong`:"no negative"}</div><div>${c.sections.map(s=>`<span class="tag">${esc(s[0])}: ${s[1]}</span>`).join("")}</div><button class="btn primary" style="width:100%;margin-top:8px" onclick="pickExam('${k}')">Choose</button></div>`).join("");
+}
+function pickExam(k){state.exam=k;const c=EXAMS[k];const el=document.getElementById("mockPicker");el.classList.remove("hidden");el.innerHTML=`<div class="between"><div><h2 style="margin:0">${esc(c.name)}</h2><div class="small">${totalQ(c)} questions • ${c.minutes} minutes</div></div><button class="btn" onclick="el('mockPicker').classList.add('hidden')">Close</button></div><div class="grid" style="margin-top:10px">${Array.from({length:20},(_,i)=>`<button class="btn" onclick="startMock('${k}',${i+1})">Mock ${i+1}</button>`).join("")}</div><h3 style="margin-bottom:5px">Last-year paper archive</h3><div class="grid">${Array.from({length:8},(_,i)=>{let y=2019+i;return `<button class="btn" disabled title="Requires licensed/permissioned paper pack">Last year paper mock — ${y}<br><span class="small">Licensed pack required</span></button>`}).join("")}</div><div class="notice" style="margin-top:10px">Actual papers from 2019–2026 are not fabricated here. Import only questions you own or are licensed/permissioned to use. The engine labels original questions as PYQ-style and licensed questions as Licensed PYQ.</div>`}
+function el(id){return document.getElementById(id)}
+function startMock(k,m){
+ state.exam=k;state.mock=m;state.questions=buildMock(k,m);state.answers={};state.qIndex=0;state.startedAt=Date.now();state.qStartedAt=Date.now();state.questionTimes={};state.finished=false;state.endAt=Date.now()+EXAMS[k].minutes*60000;localStorage.setItem("afterboards.active",JSON.stringify({exam:k,mock:m,endAt:state.endAt,qIndex:0,answers:{},startedAt:state.startedAt,questionTimes:{}}));
+ if(!validateQuestionBank(state.questions)) throw new Error("Question-bank validation failed");
+ showView("test");renderTest();clearInterval(state.timer);state.timer=setInterval(tick,250);tick();
+}
+function showView(id){document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));el(id).classList.add("active");document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===id));window.scrollTo(0,0)}
+function restoreActive(){try{const a=JSON.parse(localStorage.getItem("afterboards.active")||"null");if(!a||!EXAMS[a.exam]||!a.endAt||a.endAt<=Date.now())return false;state.exam=a.exam;state.mock=a.mock;state.questions=buildMock(a.exam,a.mock);state.answers=a.answers||{};state.qIndex=Math.min(Math.max(0,a.qIndex||0),state.questions.length-1);state.startedAt=a.startedAt||Date.now();state.qStartedAt=Date.now();state.questionTimes=a.questionTimes||{};state.finished=false;state.endAt=a.endAt;showView("test");renderTest();clearInterval(state.timer);state.timer=setInterval(tick,250);tick();return true}catch(e){localStorage.removeItem("afterboards.active");return false}}
+
+function sectionStart(si){let n=0;for(let i=0;i<si;i++)n+=EXAMS[state.exam].sections[i][1];return n}
+function currentSection(){let n=0;for(let i=0;i<EXAMS[state.exam].sections.length;i++){let c=EXAMS[state.exam].sections[i][1];if(state.qIndex<n+c)return i;n+=c}return EXAMS[state.exam].sections.length-1}
+function renderTest(){
+ const c=EXAMS[state.exam], qn=state.questions[state.qIndex], si=currentSection();state.sectionIndex=si;
+ el("testTitle").textContent=`${c.name} — Mock ${state.mock}`;
+ el("testMeta").textContent=`Question ${state.qIndex+1} / ${state.questions.length} • ${qn.section}`;
+ el("progress").style.width=((state.qIndex+1)/state.questions.length*100)+"%";
+ el("sectionTabs").innerHTML=c.sections.map((s,i)=>`<button class="btn ${i===si?"primary":""}" onclick="jumpSection(${i})">${esc(s[0])}</button>`).join("");
+ let selected=state.answers[qn.id];
+ el("questionCard").innerHTML=`<div class="qmeta">${esc(qn.section)} • ${qn.source==="licensed-pyq"?"Licensed PYQ":"Original PYQ-style"}</div><div class="qtext">${esc(qn.text)}</div>${qn.type==="sa"?`<input id="saInput" type="text" inputmode="numeric" placeholder="Enter answer" value="${selected==null?"":esc(selected)}">`:`<div class="opts">${qn.options.map((o,i)=>`<button class="opt ${selected===i?"sel":""}" onclick="choose(${i})"><b>${String.fromCharCode(65+i)}</b><span>${esc(o)}</span></button>`).join("")}</div>`}<div class="actions"><button class="btn" onclick="prevQ()">Previous</button><button class="btn primary" onclick="nextQ()">${state.qIndex===state.questions.length-1?"Submit":"Next"}</button></div><button class="btn" style="width:100%;margin-top:8px" onclick="finishMock(true)">Submit mock now</button>`;
+}
+function choose(i){state.answers[state.questions[state.qIndex].id]=i;renderTest()}
+function recordQuestionTime(){if(!state.questions.length)return;const id=state.questions[state.qIndex]?.id;if(!id)return;state.questionTimes[id]=(state.questionTimes[id]||0)+Math.max(0,Date.now()-state.qStartedAt);state.qStartedAt=Date.now();}
+function nextQ(){recordQuestionTime();if(state.questions[state.qIndex].type==="sa"){let v=el("saInput").value.trim();if(v)state.answers[state.questions[state.qIndex].id]=v}if(state.qIndex<state.questions.length-1){state.qIndex++;renderTest()}else finishMock(false)}
+function prevQ(){recordQuestionTime();if(state.questions[state.qIndex].type==="sa"){let v=el("saInput").value.trim();if(v)state.answers[state.questions[state.qIndex].id]=v}if(state.qIndex>0){state.qIndex--;renderTest()}}
+function jumpSection(si){recordQuestionTime();state.qIndex=sectionStart(si);renderTest()}
+function tick(){let left=Math.max(0,state.endAt-Date.now());let sec=Math.ceil(left/1000);el("timer").textContent=`${String(Math.floor(sec/60)).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`;if(left<=0){clearInterval(state.timer);finishMock(false)}}
+function persistActive(){if(state.exam&&!state.finished)localStorage.setItem("afterboards.active",JSON.stringify({exam:state.exam,mock:state.mock,endAt:state.endAt,qIndex:state.qIndex,answers:state.answers,startedAt:state.startedAt,questionTimes:state.questionTimes}))}
+window.addEventListener("beforeunload",persistActive);
+function finishMock(force){
+ if(!state.exam||!state.questions.length)return;
+ if(state.questions[state.qIndex]?.type==="sa"&&el("saInput")){let v=el("saInput").value.trim();if(v)state.answers[state.questions[state.qIndex].id]=v}
+ recordQuestionTime(); clearInterval(state.timer);state.finished=true;let cfg=EXAMS[state.exam],result=scoreAnswers(state.questions,state.answers,cfg);
+ let {correct,wrong,unattempted,score,max}=result, pct=max?Math.max(0,score/max*100):0;
+ const times=Object.values(state.questionTimes);const attemptedTimes=times.filter(x=>x>0);const avgMs=attemptedTimes.length?attemptedTimes.reduce((a,b)=>a+b,0)/attemptedTimes.length:0;const totalMs=Date.now()-state.startedAt;
+ const analysis={avgSeconds:+(avgMs/1000).toFixed(1),totalSeconds:Math.round(totalMs/1000),accuracy:+(correct/Math.max(1,correct+wrong)*100).toFixed(1),questionTimes:state.questionTimes};
+ localStorage.removeItem("afterboards.active");saveStat({date:new Date().toISOString(),exam:state.exam,mock:state.mock,correct,wrong,unattempted,score,max,pct:+pct.toFixed(2),analysis});
+ el("questionCard").innerHTML=`<h2>Mock submitted</h2><div class="statgrid"><div class="stat"><strong>${correct}</strong>Correct</div><div class="stat"><strong>${wrong}</strong>Wrong</div><div class="stat"><strong>${unattempted}</strong>Unattempted</div><div class="stat"><strong>${score}</strong>Score</div><div class="stat"><strong>${analysis.accuracy}%</strong>Accuracy</div><div class="stat"><strong>${analysis.avgSeconds}s</strong>Avg/question</div></div><p><b>${pct.toFixed(1)}%</b> of maximum score • Total time: ${Math.floor(analysis.totalSeconds/60)}m ${analysis.totalSeconds%60}s</p><div class="card" style="box-shadow:none;background:#f8fafc"><b>Question-time analysis</b><div class="small" style="margin-top:5px">Average time is calculated from active question time. Skipped/unvisited questions are not counted.</div></div><div class="actions"><button class="btn primary" onclick="showView('home');pickExam('${state.exam}')">Choose another mock</button><button class="btn" onclick="showStats()">View stats</button></div>`;
+}
+function showStats(){showView("stats");renderStats()}
+function renderStats(){let a=getStats();if(!a.length){el("statsBox").innerHTML=`<p class="small">No attempts yet. Your results stay on this device using localStorage.</p>`;return}let avg=a.reduce((s,x)=>s+x.pct,0)/a.length,best=Math.max(...a.map(x=>x.pct));let acc=a.reduce((s,x)=>s+(x.analysis?.accuracy||0),0)/a.length;let t=a.filter(x=>x.analysis).reduce((s,x)=>s+x.analysis.avgSeconds,0)/Math.max(1,a.filter(x=>x.analysis).length);el("statsBox").innerHTML=`<div class="statgrid"><div class="stat"><strong>${a.length}</strong>Attempts</div><div class="stat"><strong>${avg.toFixed(1)}%</strong>Average score</div><div class="stat"><strong>${best.toFixed(1)}%</strong>Best score</div><div class="stat"><strong>${acc.toFixed(1)}%</strong>Avg accuracy</div><div class="stat"><strong>${t.toFixed(1)}s</strong>Avg/question</div></div><div style="margin-top:12px">${a.slice(0,30).map(x=>`<div class="card" style="box-shadow:none;margin:7px 0;padding:11px"><b>${esc(EXAMS[x.exam]?.name||x.exam)} — ${x.mock>=1&&x.mock<=20?`Mock ${x.mock}`:"Mock"}</b><div class="small">${new Date(x.date).toLocaleString()} • ${x.correct}✓ ${x.wrong}✗ ${x.unattempted} skipped • ${x.score}/${x.max} • accuracy ${x.analysis?.accuracy??"—"}% • avg ${x.analysis?.avgSeconds??"—"}s/question</div></div>`).join("")}</div>`}
+
+function newWord(){let w=WORDS[Math.floor(Math.random()*WORDS.length)];el("wordBox").innerHTML=`<h2>${esc(w[0])}</h2><p><b>Meaning:</b> ${esc(w[1])}</p><p><b>Synonym:</b> ${esc(w[3])}</p><p><b>Example:</b> ${esc(w[2])}</p>`}
+el("newWord").onclick=newWord;
+el("clearStats").onclick=()=>{localStorage.removeItem(STORAGE);renderStats()};
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{showView(b.dataset.view);if(b.dataset.view==="stats")renderStats()});
+renderExams();newWord();renderStats();restoreActive();
+
+/* Testable pure API. */
+function validateAllMocks(){return Object.entries(EXAMS).every(([k,c])=>Array.from({length:20},(_,i)=>buildMock(k,i+1)).every(qs=>qs.length===totalQ(c)&&validateQuestionBank(qs)))}
+window.AfterBoardsTest={EXAMS,totalQ,buildMock,hashSeed,getStats,scoreAnswers,validateQuestionBank,validateAllMocks};
+</script>
+</body>
+</html>
